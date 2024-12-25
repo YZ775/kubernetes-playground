@@ -63,3 +63,31 @@
   service:
     name: containerd
     state: restarted
+
+- name: register nginx apt key
+  shell: curl -fsSL https://nginx.org/keys/nginx_signing.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/nginx-apt-keyring.gpg
+
+- name: add nginx apt repository
+  lineinfile:
+    path: /etc/apt/sources.list.d/nginx.list
+    line: deb [signed-by=/etc/apt/keyrings/nginx-apt-keyring.gpg] https://nginx.org/packages/mainline/ubuntu/ {{os}} nginx
+    create: yes
+
+- name: install nginx
+  package:
+    name:
+    - nginx
+    update_cache: yes
+
+- name: copy nginx config
+  template:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted

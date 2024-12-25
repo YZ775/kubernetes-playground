@@ -1,4 +1,7 @@
 users:
 - name: test
+  groups: [sudo]
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  shell: /bin/bash
   ssh_import_id:
   - gh:YZ775

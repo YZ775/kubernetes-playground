@@ -1,0 +1,20 @@
+- name: Download go binary
+  get_url:
+    url: https://golang.org/dl/go{{ go_version }}.linux-{{ arch }}.tar.gz
+    dest: /tmp/go{{ go_version }}.linux-{{ arch }}.tar.gz
+    mode: 0644
+  register: go_download
+
+- name: Extract go binary
+  unarchive:
+    src: /tmp/go{{ go_version }}.linux-{{ arch }}.tar.gz
+    dest: /usr/local
+    remote_src: yes
+  become: true
+  when: go_download.changed
+
+- name: Set go environment variables
+  lineinfile:
+    path: .bashrc
+    line: "export PATH=$PATH:/usr/local/go/bin"
+  when: go_download.changed

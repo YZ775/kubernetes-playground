@@ -1,18 +1,13 @@
-# - name: My first play
-#   hosts: myhosts
-#   tasks:
-#    - name: Ping my hosts
-#      ansible.builtin.ping:
-
-#    - name: Print message
-#      ansible.builtin.debug:
-#        msg: Hello world
-
 - name: setup k8s node
   hosts: k8sNodes
   become: true
   roles:
     - k8s
+    - go
   vars:
     arch: arm64
     os: noble
+    go_version: 1.23.4
+    node1: 192.168.209.12
+    node2: 192.168.209.13
+    node3: 192.168.209.14
