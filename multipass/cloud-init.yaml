@@ -1,0 +1,4 @@
+users:
+- name: test
+  ssh_import_id:
+  - gh:YZ775

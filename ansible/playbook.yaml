@@ -1,0 +1,18 @@
+# - name: My first play
+#   hosts: myhosts
+#   tasks:
+#    - name: Ping my hosts
+#      ansible.builtin.ping:
+
+#    - name: Print message
+#      ansible.builtin.debug:
+#        msg: Hello world
+
+- name: setup k8s node
+  hosts: k8sNodes
+  become: true
+  roles:
+    - k8s
+  vars:
+    arch: arm64
+    os: noble

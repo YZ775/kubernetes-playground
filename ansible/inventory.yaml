@@ -1,0 +1,5 @@
+k8sNodes:
+  hosts:
+    my_host_01:
+      ansible_host: 192.168.64.8
+      ansible_user: ubuntu

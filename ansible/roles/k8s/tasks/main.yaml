@@ -1,0 +1,65 @@
+- name: Install Packages
+  package:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gpg
+    update_cache: yes
+
+- name: download docker GPG key
+  shell: sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+
+- name: Add the Docker apt repository
+  lineinfile:
+    path: /etc/apt/sources.list.d/docker.list
+    line: deb [arch={{arch}} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{os}} stable
+    create: yes
+
+- name: Install Docker Packages
+  package:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    update_cache: yes
+
+- name: download k8s GPG key
+  shell: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Add the Kubernetes apt repository
+  lineinfile:
+    path: /etc/apt/sources.list.d/kubernetes.list
+    line: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /
+    create: yes
+
+- name: Install k8s Packages
+  package:
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl
+    update_cache: yes
+
+- name: change cgroup driver for kubelet
+  lineinfile:
+    path: /etc/default/kubelet
+    regexp: 'KUBELET_EXTRA_ARGS='
+    line: KUBELET_EXTRA_ARGS=--cgroup-driver=systemd
+    create: yes
+
+- name: generate default containerd config
+  shell: sudo containerd config default | sudo tee /etc/containerd/config.toml
+
+- name: change cgroup driver for containerd
+  replace:
+    path: /etc/containerd/config.toml
+    regexp: 'SystemdCgroup = false'
+    replace: SystemdCgroup = true
+
+- name: restart containerd
+  service:
+    name: containerd
+    state: restarted
